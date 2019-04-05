@@ -17,13 +17,12 @@ import spacy
 from collections import OrderedDict, defaultdict, Counter
 
 from benepar.spacy_plugin import BeneparComponent
-from pyjsonnlp import get_base, get_base_document, remove_empty_fields
+from pyjsonnlp import get_base, get_base_document, remove_empty_fields, build_constituents, find_head, build_coreference
 from pyjsonnlp.pipeline import Pipeline
-from pyjsonnlp.util import build_constituents, find_head, build_coreference
 
 name = "spacypyjsonnlp"
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 # allowed model names
 MODEL_NAMES = ('en', 'en_core_web_md', 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',

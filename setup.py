@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="spacyjsonnlp",
-    version="0.0.1",
+    version="0.0.2",
     author="Damir Cavar, Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili",
     author_email="damir@cavar.me",
     description="The Python spaCy JSON-NLP package",
