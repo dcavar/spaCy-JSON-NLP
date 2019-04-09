@@ -7,7 +7,9 @@ Brought to you by the [NLP-Lab.org]!
 
 ## Introduction
 
-[spaCy] wrapper for [JSON-NLP].
+This module provides a [spaCy] wrapper for [JSON-NLP]. It takes the [spaCy] output and generates a [JSON-NLP] output from it. It also provides a Microservice wrapper that allows you to launch the [spaCy] module as a RESTful service using [Flask] or WSGI.
+
+
 
 
 
@@ -18,7 +20,7 @@ Brought to you by the [NLP-Lab.org]!
 [Flair]: https://github.com/zalandoresearch/flair "Flair"
 [spaCy]: https://spacy.io/ "spaCy"
 [NLTK]: http://nltk.org/ "Natural Language Processing Toolkit"
-[Polyglot]: https://github.com/aboSamoor/polyglot "Polyglot" 
+[Polyglot]: https://github.com/aboSamoor/polyglot "Polyglot"
 [Xrenner]: https://github.com/amir-zeldes/xrenner "Xrenner"
 [CONLL-U]: https://universaldependencies.org/format.html "CONLL-U"
-
+[Flask]: http://flask.pocoo.org/ "Flask"
