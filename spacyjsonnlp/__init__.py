@@ -17,18 +17,21 @@ import spacy
 from collections import OrderedDict, defaultdict, Counter
 
 from benepar.spacy_plugin import BeneparComponent
+import neuralcoref
 from pyjsonnlp import get_base, get_base_document, remove_empty_fields, build_constituents, find_head, build_coreference
 from pyjsonnlp.pipeline import Pipeline
 
+from setup import version
+
 name = "spacypyjsonnlp"
 
-__version__ = "0.0.2"
+__version__ = version
 
 # allowed model names
 MODEL_NAMES = ('en', 'en_core_web_md', 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
                'pt_core_news_sm', 'fr_core_news_sm', 'it_core_news_sm', 'nl_core_news_sm')
 CONSTITUENTS = {'en': 'benepar_en2', 'en_core_web_md': 'benepar_en2', 'de_core_news_sm': 'benepar_de'}
-COREF = {'en': 'en_coref_md', 'en_core_web_md': 'en_coref_md'}
+COREF = {'en'}
 WORD_REGEX = re.compile(r'^[A-Za-z]+$')
 
 __cache = defaultdict(dict)
@@ -53,10 +56,9 @@ def cache_it(func):
 def get_model(spacy_model: str, coref: bool, constituents: bool) -> Callable:
     if spacy_model not in MODEL_NAMES:
         raise ModuleNotFoundError(f'No such spaCy model "{spacy_model}"')
+    nlp = spacy.load(spacy_model)
     if coref and spacy_model in COREF:
-        nlp = spacy.load(COREF[spacy_model])
-    else:
-        nlp = spacy.load(spacy_model)
+        neuralcoref.add_to_pipe(nlp)
     if constituents and spacy_model in CONSTITUENTS:
         nlp.add_pipe(BeneparComponent(CONSTITUENTS[spacy_model]))
     return nlp
