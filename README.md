@@ -1,6 +1,6 @@
 # spaCy to JSON-NLP
 
-(C) 2019 by [Damir Cavar], Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili
+(C) 2019 by [Damir Cavar], [Oren Baldinger], Maanvitha Gongalla, Anurag Kumar, Murali Kammili
 
 Brought to you by the [NLP-Lab.org]!
 
@@ -38,8 +38,6 @@ The [JSON-NLP] repository provides a Microservice class, with a pre-built implem
     
     python spacyjsonnlp/server.py
  
-Note that if you use [Flask]'s debug mode like this, the server will not be persistent and all models will be reloaded with each call. See the [JSON-NLP] repository to implement other webserver architectures.
-
 Since `server.py` extends the [Flask] app, a WSGI file would contain:
 
     from spacyjsonnlp.server import app as application
@@ -74,7 +72,7 @@ Here is an example `GET` call:
     http://localhost:5000?spacy_model=en&constituents=0&text=I am a sentence.
 
 [Damir Cavar]: http://damir.cavar.me/ "Damir Cavar"
-[Oren Baldinger]: http://oren.baldinger.me/ "Oren Baldinger"
+[Oren Baldinger]: https://oren.baldinger.me/ "Oren Baldinger"
 [NLP-Lab.org]: http://nlp-lab.org/ "NLP-Lab.org"
 [JSON-NLP]: https://github.com/dcavar/JSON-NLP "JSON-NLP"
 [Flair]: https://github.com/zalandoresearch/flair "Flair"

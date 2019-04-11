@@ -21,11 +21,8 @@ import neuralcoref
 from pyjsonnlp import get_base, get_base_document, remove_empty_fields, build_constituents, find_head, build_coreference
 from pyjsonnlp.pipeline import Pipeline
 
-from setup import version
-
 name = "spacypyjsonnlp"
-
-__version__ = version
+__version__ = '0.0.3'
 
 # allowed model names
 MODEL_NAMES = ('en', 'en_core_web_md', 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
@@ -68,7 +65,8 @@ class SpacyPipeline(Pipeline):
     @staticmethod
     def process(text: str = '', spacy_model='en', coreferences=False, constituents=False, dependencies=True, expressions=True) -> OrderedDict:
         """Process provided text"""
-        doc = get_model(spacy_model, coreferences, constituents)(text)
+        nlp = get_model(spacy_model, coreferences, constituents)
+        doc = nlp(text)
         j: OrderedDict = get_base()
         d: OrderedDict = get_base_document('1')
         j['documents'][d['id']] = d
@@ -130,13 +128,10 @@ class SpacyPipeline(Pipeline):
                 last_char_index = t['characterOffsetEnd']
 
                 # morphology
-                try:
-                    # noinspection PyUnresolvedReferences
-                    for i, kv in enumerate(nlp.vocab.morphology.tag_map.get(token.tag_, {}).items()):
-                        if i > 0:  # numeric k/v pair at the beginning
-                            t['features'][kv[0]] = kv[1].title()
-                except:
-                    pass
+                # noinspection PyUnresolvedReferences
+                for i, kv in enumerate(nlp.vocab.morphology.tag_map.get(token.tag_, {}).items()):
+                    if i > 0:  # numeric k/v pair at the beginning
+                        t['features'][kv[0]] = kv[1].title()
 
                 # entities
                 if token.ent_type_:
@@ -159,20 +154,14 @@ class SpacyPipeline(Pipeline):
         # noun phrases
         if expressions:
             for chunk in doc.noun_chunks:
-                # note that this includes NPs containing a single noun
-                sent_id = sent_lookup[chunk.sent.sent.end_char]
-                e = {
-                    'type': 'NP',
-                    'head': token_lookup[(sent_id, chunk.root.i)],
-                    'dependency': chunk.root.dep_,
-                    'tokens': [token_lookup[(sent_id, token.i)] for token in chunk]
-                }
-                for token in chunk.rights:
-                    e['tokens'].append(token_lookup[(sent_id, token.i)])
-                # ignore noun phrases consisting of one token
-                if len(e['tokens']) == 1:
-                    continue
-                d['expressions'].append(e)
+                if len(chunk) > 1:
+                    sent_id = sent_lookup[chunk.sent.sent.end_char]
+                    d['expressions'].append({
+                        'type': 'NP',
+                        'head': token_lookup[(sent_id, chunk.root.i)],
+                        'dependency': chunk.root.dep_.lower(),
+                        'tokens': [token_lookup[(sent_id, token.i)] for token in chunk]
+                    })
 
         # dependencies
         if dependencies:
@@ -200,7 +189,7 @@ class SpacyPipeline(Pipeline):
                 r['representative']['tokens'] = [t.i+1 for t in cluster.main]
                 r['representative']['head'] = find_head(d, r['representative']['tokens'], 'universal')
                 for m in cluster.mentions:
-                    if m[0].i in r['representative']['tokens']:
+                    if m[0].i+1 in r['representative']['tokens']:
                         continue  # don't include the representative in the mention list
                     ref = {'tokens': [t.i+1 for t in m]}
                     ref['head'] = find_head(d, ref['tokens'], 'universal')
