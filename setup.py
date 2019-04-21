@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="spacyjsonnlp",
-    version='0.0.3',
+    version='0.0.4',
     python_requires='>=3.6',
     author="Damir Cavar, Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili",
     author_email="damir@cavar.me",
@@ -18,7 +18,7 @@ setuptools.setup(
     install_requires=[
         'spacy>=2.1',
         'neuralcoref>=4.0',
-        'pyjsonnlp>=0.2.5',
+        'pyjsonnlp>=0.2.6',
         'benepar[cpu]>=0.1.2',
         'cython',
         'numpy>=1.14'

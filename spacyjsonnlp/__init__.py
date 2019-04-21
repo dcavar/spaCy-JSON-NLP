@@ -11,18 +11,20 @@ Brought to you by the NLP-Lab.org (https://nlp-lab.org/)!
 """
 import functools
 import re
-from typing import Callable, Dict, Tuple
-
-import spacy
 from collections import OrderedDict, defaultdict, Counter
+from typing import Dict, Tuple
 
-from benepar.spacy_plugin import BeneparComponent
 import neuralcoref
+import spacy
+from benepar.spacy_plugin import BeneparComponent
 from pyjsonnlp import get_base, get_base_document, remove_empty_fields, build_constituents, find_head, build_coreference
 from pyjsonnlp.pipeline import Pipeline
+from pyjsonnlp.tokenization import segment
+from spacy.language import Language
+from spacy.tokens import Doc
 
 name = "spacypyjsonnlp"
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 # allowed model names
 MODEL_NAMES = ('en', 'en_core_web_md', 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
@@ -50,7 +52,7 @@ def cache_it(func):
 
 
 @cache_it
-def get_model(spacy_model: str, coref: bool, constituents: bool) -> Callable:
+def get_model(spacy_model: str, coref: bool, constituents: bool) -> Language:
     if spacy_model not in MODEL_NAMES:
         raise ModuleNotFoundError(f'No such spaCy model "{spacy_model}"')
     nlp = spacy.load(spacy_model)
@@ -61,14 +63,29 @@ def get_model(spacy_model: str, coref: bool, constituents: bool) -> Callable:
     return nlp
 
 
+class SyntokTokenizer(object):
+    def __init__(self, vocab):
+        self.vocab = vocab
+
+    def __call__(self, text):
+        words = []
+        spaces = []
+        for sent in segment(text):
+            for token in sent:
+                words.append(token.value)
+                spaces.append(token.space_after)
+        return Doc(self.vocab, words=words, spaces=spaces)
+
+
 class SpacyPipeline(Pipeline):
     @staticmethod
     def process(text: str = '', spacy_model='en', coreferences=False, constituents=False, dependencies=True, expressions=True) -> OrderedDict:
         """Process provided text"""
         nlp = get_model(spacy_model, coreferences, constituents)
+        nlp.tokenizer = SyntokTokenizer(nlp.vocab)
         doc = nlp(text)
         j: OrderedDict = get_base()
-        d: OrderedDict = get_base_document('1')
+        d: OrderedDict = get_base_document(1)
         j['documents'][d['id']] = d
 
         d['meta']['DC.source'] = 'SpaCy {}'.format(spacy.__version__)
@@ -81,9 +98,10 @@ class SpacyPipeline(Pipeline):
 
         # tokens and sentences
         token_id = 1
-        for sent_num, sent in enumerate(doc.sents):
+        sent_num = 1
+        for sent in doc.sents:
             current_sent = {
-                'id': str(sent_num),
+                'id': sent_num,
                 'tokenFrom': token_id,
                 'tokenTo': token_id + len(sent),  # begin inclusive, end exclusive
                 'tokens': []
@@ -128,7 +146,6 @@ class SpacyPipeline(Pipeline):
                 last_char_index = t['characterOffsetEnd']
 
                 # morphology
-                # noinspection PyUnresolvedReferences
                 for i, kv in enumerate(nlp.vocab.morphology.tag_map.get(token.tag_, {}).items()):
                     if i > 0:  # numeric k/v pair at the beginning
                         t['features'][kv[0]] = kv[1].title()
@@ -149,19 +166,24 @@ class SpacyPipeline(Pipeline):
                 token_id += 1
 
             d['tokenList'][token_id-1]['misc']['SpaceAfter'] = 'Yes'  # EOS tokens have spaces after them
+            sent_num += 1
+
         d['tokenList'][token_id-1]['misc']['SpaceAfter'] = 'No'  # EOD tokens do not
 
         # noun phrases
         if expressions:
+            chunk_id = 1
             for chunk in doc.noun_chunks:
                 if len(chunk) > 1:
                     sent_id = sent_lookup[chunk.sent.sent.end_char]
                     d['expressions'].append({
+                        'id': chunk_id,
                         'type': 'NP',
                         'head': token_lookup[(sent_id, chunk.root.i)],
                         'dependency': chunk.root.dep_.lower(),
                         'tokens': [token_lookup[(sent_id, token.i)] for token in chunk]
                     })
+                    chunk_id += 1
 
         # dependencies
         if dependencies:
@@ -172,11 +194,11 @@ class SpacyPipeline(Pipeline):
             d['dependencies'].append(deps)
             for sent_num, sent in enumerate(doc.sents):
                 for token in sent:
-                    dependent = token_lookup[(sent_num, token.i)]
+                    dependent = token_lookup[(sent_num+1, token.i)]
                     deps['arcs'][dependent] = [{
-                        'sentenceId': str(sent_num),
+                        'sentenceId': sent_num+1,
                         'label': token.dep_ if token.dep_ != 'ROOT' else 'root',
-                        'governor': token_lookup[(sent_num, token.head.i)] if token.dep_ != 'ROOT' else 0,
+                        'governor': token_lookup[(sent_num+1, token.head.i)] if token.dep_ != 'ROOT' else 0,
                         'dependent': dependent
                     }]
 
