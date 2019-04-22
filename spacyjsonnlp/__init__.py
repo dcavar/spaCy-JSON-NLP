@@ -24,13 +24,14 @@ from spacy.language import Language
 from spacy.tokens import Doc
 
 name = "spacypyjsonnlp"
-__version__ = '0.0.4'
+__version__ = '0.0.5'
 
 # allowed model names
-MODEL_NAMES = ('en', 'en_core_web_md', 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
+MODEL_NAMES = ('en', 'en_core_web_md', 'en_core_web_lg' 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
                'pt_core_news_sm', 'fr_core_news_sm', 'it_core_news_sm', 'nl_core_news_sm')
-CONSTITUENTS = {'en': 'benepar_en2', 'en_core_web_md': 'benepar_en2', 'de_core_news_sm': 'benepar_de'}
-COREF = {'en'}
+CONSTITUENTS = {'en': 'benepar_en2', 'en_core_web_md': 'benepar_en2',
+                'en_core_web_lg': 'benepar_en2', 'de_core_news_sm': 'benepar_de'}
+COREF = {'en', 'en_core_web_md', 'en_core_web_lg', 'xx_ent_wiki_sm'}
 WORD_REGEX = re.compile(r'^[A-Za-z]+$')
 
 __cache = defaultdict(dict)
@@ -148,7 +149,7 @@ class SpacyPipeline(Pipeline):
                 # morphology
                 for i, kv in enumerate(nlp.vocab.morphology.tag_map.get(token.tag_, {}).items()):
                     if i > 0:  # numeric k/v pair at the beginning
-                        t['features'][kv[0]] = kv[1].title()
+                        t['features'][kv[0]] = str(kv[1]).title()
 
                 # entities
                 if token.ent_type_:
@@ -221,3 +222,8 @@ class SpacyPipeline(Pipeline):
         d['meta']['DC.language'] = max(lang)
 
         return remove_empty_fields(j)
+
+
+if __name__ == "__main__":
+    test_text = "The Mueller Report is a very long report. We spent a long time analyzing it. Trump wishes we didn't, but that didn't stop the intrepid NlpLab."
+    print(SpacyPipeline.process(test_text, spacy_model='en_core_web_md', coreferences=True))
