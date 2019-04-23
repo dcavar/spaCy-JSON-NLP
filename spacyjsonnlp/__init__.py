@@ -24,14 +24,14 @@ from spacy.language import Language
 from spacy.tokens import Doc
 
 name = "spacypyjsonnlp"
-__version__ = '0.0.6'
+__version__ = '0.0.7'
 
 # allowed model names
 MODEL_NAMES = ('en_core_web_sm', 'en_core_web_md', 'en_core_web_lg' 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
                'pt_core_news_sm', 'fr_core_news_sm', 'it_core_news_sm', 'nl_core_news_sm')
-CONSTITUENTS = {'en': 'benepar_en2', 'en_core_web_md': 'benepar_en2',
+CONSTITUENTS = {'en_core_web_sm': 'benepar_en2', 'en_core_web_md': 'benepar_en2',
                 'en_core_web_lg': 'benepar_en2', 'de_core_news_sm': 'benepar_de'}
-COREF = {'en', 'en_core_web_md', 'en_core_web_lg', 'xx_ent_wiki_sm'}
+COREF = {'en_core_web_sm', 'en_core_web_md', 'en_core_web_lg', 'xx_ent_wiki_sm'}
 WORD_REGEX = re.compile(r'^[A-Za-z]+$')
 
 __cache = defaultdict(dict)
