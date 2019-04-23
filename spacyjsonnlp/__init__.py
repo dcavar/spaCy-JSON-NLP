@@ -24,10 +24,10 @@ from spacy.language import Language
 from spacy.tokens import Doc
 
 name = "spacypyjsonnlp"
-__version__ = '0.0.5'
+__version__ = '0.0.6'
 
 # allowed model names
-MODEL_NAMES = ('en', 'en_core_web_md', 'en_core_web_lg' 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
+MODEL_NAMES = ('en_core_web_sm', 'en_core_web_md', 'en_core_web_lg' 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
                'pt_core_news_sm', 'fr_core_news_sm', 'it_core_news_sm', 'nl_core_news_sm')
 CONSTITUENTS = {'en': 'benepar_en2', 'en_core_web_md': 'benepar_en2',
                 'en_core_web_lg': 'benepar_en2', 'de_core_news_sm': 'benepar_de'}
@@ -54,6 +54,8 @@ def cache_it(func):
 
 @cache_it
 def get_model(spacy_model: str, coref: bool, constituents: bool) -> Language:
+    if spacy_model == 'en':
+        spacy_model = 'en_core_web_sm'
     if spacy_model not in MODEL_NAMES:
         raise ModuleNotFoundError(f'No such spaCy model "{spacy_model}"')
     nlp = spacy.load(spacy_model)
@@ -80,7 +82,7 @@ class SyntokTokenizer(object):
 
 class SpacyPipeline(Pipeline):
     @staticmethod
-    def process(text: str = '', spacy_model='en', coreferences=False, constituents=False, dependencies=True, expressions=True) -> OrderedDict:
+    def process(text: str = '', spacy_model='en_core_web_sm', coreferences=False, constituents=False, dependencies=True, expressions=True) -> OrderedDict:
         """Process provided text"""
         nlp = get_model(spacy_model, coreferences, constituents)
         nlp.tokenizer = SyntokTokenizer(nlp.vocab)
