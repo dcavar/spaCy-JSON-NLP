@@ -112,7 +112,10 @@ class SpacyPipeline(Pipeline):
             }
             if constituents:
                 # noinspection PyProtectedMember
-                d['constituents'].append(build_constituents(sent_num, sent._.parse_string))
+                try:
+                    d['constituents'].append(build_constituents(sent_num, sent._.parse_string))
+                except Exception:
+                    pass
 
             sent_lookup[sent.end_char] = sent_num
             d['sentences'][current_sent['id']] = current_sent
