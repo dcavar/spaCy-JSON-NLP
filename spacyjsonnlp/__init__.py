@@ -26,7 +26,7 @@ from spacy.tokens import Doc
 from spacyjsonnlp.dependencies import DependencyAnnotator
 
 name = "spacypyjsonnlp"
-__version__ = '0.0.9'
+__version__ = '0.0.10'
 
 # allowed model names
 MODEL_NAMES = ('en_core_web_sm', 'en_core_web_md', 'en_core_web_lg' 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
@@ -210,6 +210,10 @@ class SpacyPipeline(Pipeline):
                         'dependent': dependent
                     }]
 
+            # clause, grammar extractions
+            clause_annotator = DependencyAnnotator()
+            clause_annotator.annotate(j)
+
         # coref
         # noinspection PyProtectedMember
         if coreferences and doc._.coref_clusters is not None:
@@ -227,10 +231,6 @@ class SpacyPipeline(Pipeline):
                 d['coreferences'].append(r)
 
         d['meta']['DC.language'] = max(lang)
-
-        # clause, grammar extractions
-        clause_annotator = DependencyAnnotator()
-        clause_annotator.annotate(j)
 
         return remove_empty_fields(j)
 
