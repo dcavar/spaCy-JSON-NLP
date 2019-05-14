@@ -133,12 +133,12 @@ class SpacyPipeline(Pipeline):
                     'characterOffsetEnd': token.idx + len(token),
                     'lang': token.lang_,
                     'features': {
-                        'Overt': 'Yes',
-                        'Stop': 'Yes' if token.is_stop else 'No',
-                        'Alpha': 'Yes' if token.is_alpha else 'No',
+                        'Overt': True,
+                        'Stop': True if token.is_stop else False,
+                        'Alpha': True if token.is_alpha else False,
                     },
                     'misc': {
-                        'SpaceAfter': 'No'
+                        'SpaceAfter': False
                     }
                 }
 
@@ -150,7 +150,7 @@ class SpacyPipeline(Pipeline):
                 if token.idx != 0 and token.idx != last_char_index:
                     # we don't know there was a space after the previous token until we see where this one
                     # starts in relation to where the last one finished
-                    d['tokenList'][token_id-1]['misc']['SpaceAfter'] = 'Yes'
+                    d['tokenList'][token_id-1]['misc']['SpaceAfter'] = True
                 last_char_index = t['characterOffsetEnd']
 
                 # morphology
@@ -164,7 +164,7 @@ class SpacyPipeline(Pipeline):
 
                 # maybe check if a non-model language
                 if model_lang != 'xx':
-                    t['features']['Foreign'] = 'No' if model_lang == token.lang_ else 'Yes'
+                    t['features']['Foreign'] = False if model_lang == token.lang_ else True
 
                 # bookkeeping
                 lang[token.lang_] += 1
@@ -173,10 +173,10 @@ class SpacyPipeline(Pipeline):
                 d['tokenList'][token_id] = t
                 token_id += 1
 
-            d['tokenList'][token_id-1]['misc']['SpaceAfter'] = 'Yes'  # EOS tokens have spaces after them
+            d['tokenList'][token_id-1]['misc']['SpaceAfter'] = True  # EOS tokens have spaces after them
             sent_num += 1
 
-        d['tokenList'][token_id-1]['misc']['SpaceAfter'] = 'No'  # EOD tokens do not
+        d['tokenList'][token_id-1]['misc']['SpaceAfter'] = False  # EOD tokens do not
 
         # noun phrases
         if expressions:
