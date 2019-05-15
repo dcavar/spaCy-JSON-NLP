@@ -82,7 +82,7 @@ class DependencyAnnotator(Annotator):
 
     def annotate_item(self, d: UniversalDependencyParse, head: int, item: dict) -> None:
         # root
-        item['root'] = [head]
+        item['root'] = head
 
         # subject/object/verb
         if d.tokens[head]['upos'][0] == 'V' or d.tokens[head]['xpos'][0] == 'V':
