@@ -23,7 +23,7 @@ from pyjsonnlp.tokenization import segment
 from spacy.language import Language
 from spacy.tokens import Doc
 
-from dependencies import DependencyAnnotator
+from spacyjsonnlp.dependencies import DependencyAnnotator
 
 name = "spacypyjsonnlp"
 __version__ = '0.0.10'
@@ -237,4 +237,4 @@ class SpacyPipeline(Pipeline):
 
 if __name__ == "__main__":
     test_text = "The Mueller Report is a very long report. We spent a long time analyzing it. Trump wishes we didn't, but that didn't stop the intrepid NlpLab."
-    print(SpacyPipeline.process(test_text, spacy_model='en_core_web_sm', coreferences=True, constituents=False))
+    print(SpacyPipeline.process(test_text, spacy_model='en_core_web_md', coreferences=True, constituents=False))
