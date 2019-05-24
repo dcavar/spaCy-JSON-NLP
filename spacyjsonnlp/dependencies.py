@@ -33,14 +33,15 @@ class DependencyAnnotator(Annotator):
                 parent_clause_id = 0
                 item_tokens = [d.tokens[t_id] for t_id in range(sent['tokenFrom'], sent['tokenTo'])]
                 while item['complex']:
-                    if 'clauses' not in doc:
-                        doc['clauses'] = {}
+                    if 'clauses' not in doc['sentences']:
+                        doc['sentences']['clauses'] = []
                     for arc, clause_type in self.clause_types:
                         if d.is_arc_present_below(item_head, arc):
                             # clause
                             c_head, clause_tokens = d.get_leaves_by_arc(arc, head=item_head, sentence_id=s_id)
                             clause = self.build_clause(c_id, s_id, parent_clause_id, clause_type, clause_tokens)
-                            doc['clauses'][c_id] = clause
+                            #doc['clauses'][c_id] = clause
+                            doc['sentences']['clauses'].append(clause)
                             self.annotate_item(d, c_head, clause)
                             parent_clause_id = c_id
                             c_id += 1
@@ -49,7 +50,7 @@ class DependencyAnnotator(Annotator):
                             if depth == 0:
                                 matrix_tokens = subtract_tokens(item_tokens, clause_tokens)
                                 matrix = self.build_clause(c_id, s_id, 0, 'matrix', matrix_tokens)
-                                doc['clauses'][c_id] = matrix
+                                doc['sentences']['clauses'][c_id] = matrix
                                 clause['parentClauseId'] = c_id
                                 self.annotate_item(d, s_head, matrix)
                                 c_id += 1

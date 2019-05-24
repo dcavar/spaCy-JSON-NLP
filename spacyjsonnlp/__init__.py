@@ -23,8 +23,8 @@ from pyjsonnlp.tokenization import segment
 from spacy.language import Language
 from spacy.tokens import Doc
 
-from spacyjsonnlp.dependencies import DependencyAnnotator
-
+from dependencies import DependencyAnnotator
+#%%
 name = "spacypyjsonnlp"
 __version__ = '0.0.10'
 
@@ -119,7 +119,8 @@ class SpacyPipeline(Pipeline):
                     pass
 
             sent_lookup[sent.end_char] = sent_num
-            d['sentences'][current_sent['id']] = current_sent
+            #d['sentences'][current_sent['id']] =  current_sent
+            d['sentences'].append(current_sent)
             last_char_index = 0
             for token in sent:
                 t = {
@@ -170,7 +171,7 @@ class SpacyPipeline(Pipeline):
                 lang[token.lang_] += 1
                 token_lookup[(sent_num, token.i)] = token_id
                 current_sent['tokens'].append(token_id)
-                d['tokenList'][token_id] = t
+                d['tokenList'].append(t)
                 token_id += 1
 
             d['tokenList'][token_id-1]['misc']['SpaceAfter'] = True  # EOS tokens have spaces after them
