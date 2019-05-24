@@ -50,7 +50,7 @@ class DependencyAnnotator(Annotator):
                             if depth == 0:
                                 matrix_tokens = subtract_tokens(item_tokens, clause_tokens)
                                 matrix = self.build_clause(c_id, s_id, 0, 'matrix', matrix_tokens)
-                                doc['sentences']['clauses'][c_id] = matrix
+                                doc['sentences']['clauses'][c_id-1] = matrix
                                 clause['parentClauseId'] = c_id
                                 self.annotate_item(d, s_head, matrix)
                                 c_id += 1
