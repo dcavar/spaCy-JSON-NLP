@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="spacyjsonnlp",
-    version='0.0.14',
+    version='0.0.15',
     python_requires='>=3.6',
     author="Damir Cavar, Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili",
     author_email="damir@cavar.me",

@@ -20,12 +20,13 @@ class DependencyAnnotator(Annotator):
         for doc in nlp_json['documents'].values():
             c_id = 1
             d = UniversalDependencyParse(doc['dependencies'][0], doc['tokenList'])
+            doc['sentences']['clauses'] = []
             for s_id, sent in doc['sentences'].items():
                 s_head = d.sentence_heads[s_id]
 
                 # subject/object/verb
                 self.annotate_item(d, s_head, sent)
-
+                #Clauses = []
                 # clauses
                 depth = 0
                 item = sent
@@ -40,8 +41,9 @@ class DependencyAnnotator(Annotator):
                             # clause
                             c_head, clause_tokens = d.get_leaves_by_arc(arc, head=item_head, sentence_id=s_id)
                             clause = self.build_clause(c_id, s_id, parent_clause_id, clause_type, clause_tokens)
-                            #doc['clauses'][c_id] = clause
+                            doc['clauses'][c_id] = clause
                             doc['sentences']['clauses'].append(clause)
+                            #Clauses.append(clause)
                             self.annotate_item(d, c_head, clause)
                             parent_clause_id = c_id
                             c_id += 1
@@ -50,7 +52,9 @@ class DependencyAnnotator(Annotator):
                             if depth == 0:
                                 matrix_tokens = subtract_tokens(item_tokens, clause_tokens)
                                 matrix = self.build_clause(c_id, s_id, 0, 'matrix', matrix_tokens)
-                                doc['sentences']['clauses'][c_id-1] = matrix
+                                doc['sentences']['clauses'][c_id] = matrix
+                                print(c_id, c_id -1, c_id-2, matrix)
+                                #Clauses[c_id-1] = matrix
                                 clause['parentClauseId'] = c_id
                                 self.annotate_item(d, s_head, matrix)
                                 c_id += 1
@@ -60,6 +64,7 @@ class DependencyAnnotator(Annotator):
                             item_head = c_head
                             # don't need item tokens
                             break
+                #doc['sentences']['clauses'] = Clauses
 
     @staticmethod
     def build_clause(clause_id: int, sent_id: int, parent_clause_id: int, clause_type: str, tokens: List[dict]) -> dict:

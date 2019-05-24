@@ -22,12 +22,11 @@ from pyjsonnlp.pipeline import Pipeline
 from pyjsonnlp.tokenization import segment
 from spacy.language import Language
 from spacy.tokens import Doc
-from spacyjsonnlp.dependencies import DependencyAnnotator
-#from dependencies import DependencyAnnotator
-
+#from spacyjsonnlp.dependencies import DependencyAnnotator
+from dependencies import DependencyAnnotator
 
 name = "spacypyjsonnlp"
-__version__ = '0.0.14'
+__version__ = '0.0.15'
 
 # allowed model names
 MODEL_NAMES = ('en_core_web_sm', 'en_core_web_md', 'en_core_web_lg' 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
@@ -120,8 +119,8 @@ class SpacyPipeline(Pipeline):
                     pass
 
             sent_lookup[sent.end_char] = sent_num
-            #d['sentences'][current_sent['id']] =  current_sent
-            d['sentences'].append(current_sent)
+            d['sentences'][current_sent['id']] =  current_sent
+            #d['sentences'].append(current_sent)
             last_char_index = 0
             for token in sent:
                 t = {
@@ -152,7 +151,7 @@ class SpacyPipeline(Pipeline):
                 if token.idx != 0 and token.idx != last_char_index:
                     # we don't know there was a space after the previous token until we see where this one
                     # starts in relation to where the last one finished
-                    d['tokenList'][token_id-1]['misc']['SpaceAfter'] = True
+                    d['tokenList'][token_id-2]['misc']['SpaceAfter'] = True
                 last_char_index = t['characterOffsetEnd']
 
                 # morphology
@@ -175,10 +174,10 @@ class SpacyPipeline(Pipeline):
                 d['tokenList'].append(t)
                 token_id += 1
 
-            d['tokenList'][token_id-1]['misc']['SpaceAfter'] = True  # EOS tokens have spaces after them
+            d['tokenList'][token_id-2]['misc']['SpaceAfter'] = True  # EOS tokens have spaces after them
             sent_num += 1
 
-        d['tokenList'][token_id-1]['misc']['SpaceAfter'] = False  # EOD tokens do not
+        d['tokenList'][token_id-2]['misc']['SpaceAfter'] = False  # EOD tokens do not
 
         # noun phrases
         if expressions:
@@ -213,8 +212,8 @@ class SpacyPipeline(Pipeline):
                     }]
 
             # clause, grammar extractions
-            clause_annotator = DependencyAnnotator()
-            clause_annotator.annotate(j)
+            #clause_annotator = DependencyAnnotator()
+            #clause_annotator.annotate(j)
 
         # coref
         # noinspection PyProtectedMember
@@ -235,6 +234,7 @@ class SpacyPipeline(Pipeline):
         d['meta']['DC.language'] = max(lang)
 
         return remove_empty_fields(j)
+        #return j
 
 
 if __name__ == "__main__":
