@@ -23,6 +23,8 @@ from pyjsonnlp.tokenization import segment
 from spacy.language import Language
 from spacy.tokens import Doc
 from spacyjsonnlp.dependencies import DependencyAnnotator
+#from dependencies import DependencyAnnotator
+
 
 name = "spacypyjsonnlp"
 __version__ = '0.0.13'
