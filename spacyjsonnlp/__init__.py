@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 
 """
@@ -92,7 +93,7 @@ class SpacyPipeline(Pipeline):
         doc = nlp(text)
         j: OrderedDict = get_base()
         d: OrderedDict = get_base_document(1)
-        j['documents'][d['id']] = d
+        j['documents'].append(d)
 
         d['meta']['DC.source'] = 'SpaCy {}'.format(spacy.__version__)
         d['text'] = text
