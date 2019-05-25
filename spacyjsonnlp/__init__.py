@@ -27,7 +27,7 @@ from spacyjsonnlp.dependencies import DependencyAnnotator
 #from dependencies import DependencyAnnotator
 
 name = "spacypyjsonnlp"
-__version__ = '0.0.15'
+__version__ = '0.0.17'
 
 # allowed model names
 MODEL_NAMES = ('en_core_web_sm', 'en_core_web_md', 'en_core_web_lg' 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
