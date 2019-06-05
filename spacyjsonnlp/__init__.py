@@ -27,7 +27,7 @@ from spacyjsonnlp.dependencies import DependencyAnnotator
 #from dependencies import DependencyAnnotator
 
 name = "spacypyjsonnlp"
-__version__ = '0.0.17'
+__version__ = '0.0.18'
 
 # allowed model names
 MODEL_NAMES = ('en_core_web_sm', 'en_core_web_md', 'en_core_web_lg' 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
@@ -199,18 +199,21 @@ class SpacyPipeline(Pipeline):
         if dependencies:
             deps = {
                 'style': 'universal',
-                'arcs': {}
+                #'arcs': {}
+                'arcs':[]
             }
             d['dependencies'].append(deps)
             for sent_num, sent in enumerate(doc.sents):
                 for token in sent:
                     dependent = token_lookup[(sent_num+1, token.i)]
-                    deps['arcs'][dependent] = [{
-                        'sentenceId': sent_num+1,
-                        'label': token.dep_ if token.dep_ != 'ROOT' else 'root',
-                        'governor': token_lookup[(sent_num+1, token.head.i)] if token.dep_ != 'ROOT' else 0,
-                        'dependent': dependent
-                    }]
+                    #deps['arcs'][dependent] = [{
+                    deps['arcs'].append({   
+                        #'sentenceId': sent_num+1,
+                        'lab': token.dep_ if token.dep_ != 'ROOT' else 'root',
+                        'gov': token_lookup[(sent_num+1, token.head.i)] if token.dep_ != 'ROOT' else 0,
+                        'dep': dependent
+                    })
+               # print(len(deps['arcs']))
 
             # clause, grammar extractions
             #clause_annotator = DependencyAnnotator()
