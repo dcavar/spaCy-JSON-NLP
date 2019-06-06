@@ -27,7 +27,7 @@ from spacy.tokens import Doc
 #from dependencies import DependencyAnnotator
 
 name = "spacypyjsonnlp"
-__version__ = '0.0.19'
+__version__ = '0.0.20'
 
 # allowed model names
 MODEL_NAMES = ('en_core_web_sm', 'en_core_web_md', 'en_core_web_lg' 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
@@ -126,6 +126,7 @@ class SpacyPipeline(Pipeline):
             for token in sent:
                 t = {
                     'id': token_id,
+                    'sentence_id': sent_num,
                     'text': token.text,
                     'lemma': token.lemma_,
                     'xpos': token.tag_,
@@ -226,10 +227,9 @@ class SpacyPipeline(Pipeline):
         if coreferences and doc._.coref_clusters is not None:
             # noinspection PyProtectedMember
             for cluster in doc._.coref_clusters:
-                for sent_num, sent in enumerate(doc.sents):
                     r = build_coreference(cluster.i)
                     r['representative']['tokens'] = [t.i+1 for t in cluster.main]
-                    r['representative']['head'] = find_head(d, r['representative']['tokens'], sent_num+1, 'universal')
+                    r['representative']['head'] = find_head(d, r['representative']['tokens'], d['tokenList'][max(r['representative']['tokens'])]['sentence_id'], 'universal')
                     for m in cluster.mentions:
                         if m[0].i+1 in r['representative']['tokens']:
                             continue  # don't include the representative in the mention list
