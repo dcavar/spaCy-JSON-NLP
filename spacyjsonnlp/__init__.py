@@ -23,11 +23,11 @@ from pyjsonnlp.pipeline import Pipeline
 from pyjsonnlp.tokenization import segment
 from spacy.language import Language
 from spacy.tokens import Doc
-from spacyjsonnlp.dependencies import DependencyAnnotator
+#from spacyjsonnlp.dependencies import DependencyAnnotator
 #from dependencies import DependencyAnnotator
 
 name = "spacypyjsonnlp"
-__version__ = '0.0.18'
+__version__ = '0.0.19'
 
 # allowed model names
 MODEL_NAMES = ('en_core_web_sm', 'en_core_web_md', 'en_core_web_lg' 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
@@ -200,19 +200,21 @@ class SpacyPipeline(Pipeline):
             deps = {
                 'style': 'universal',
                 #'arcs': {}
-                'arcs':[]
+                'trees':[]
             }
-            d['dependencies'].append(deps)
+            d['dependencies']=deps
             for sent_num, sent in enumerate(doc.sents):
+                temp = []
                 for token in sent:
                     dependent = token_lookup[(sent_num+1, token.i)]
                     #deps['arcs'][dependent] = [{
-                    deps['arcs'].append({   
+                    temp.append({   
                         #'sentenceId': sent_num+1,
                         'lab': token.dep_ if token.dep_ != 'ROOT' else 'root',
                         'gov': token_lookup[(sent_num+1, token.head.i)] if token.dep_ != 'ROOT' else 0,
                         'dep': dependent
                     })
+                deps['trees'].append(temp)
                # print(len(deps['arcs']))
 
             # clause, grammar extractions
@@ -224,16 +226,17 @@ class SpacyPipeline(Pipeline):
         if coreferences and doc._.coref_clusters is not None:
             # noinspection PyProtectedMember
             for cluster in doc._.coref_clusters:
-                r = build_coreference(cluster.i)
-                r['representative']['tokens'] = [t.i+1 for t in cluster.main]
-                r['representative']['head'] = find_head(d, r['representative']['tokens'], 'universal')
-                for m in cluster.mentions:
-                    if m[0].i+1 in r['representative']['tokens']:
-                        continue  # don't include the representative in the mention list
-                    ref = {'tokens': [t.i+1 for t in m]}
-                    ref['head'] = find_head(d, ref['tokens'], 'universal')
-                    r['referents'].append(ref)
-                d['coreferences'].append(r)
+                for sent_num, sent in enumerate(doc.sents):
+                    r = build_coreference(cluster.i)
+                    r['representative']['tokens'] = [t.i+1 for t in cluster.main]
+                    r['representative']['head'] = find_head(d, r['representative']['tokens'], sent_num+1, 'universal')
+                    for m in cluster.mentions:
+                        if m[0].i+1 in r['representative']['tokens']:
+                            continue  # don't include the representative in the mention list
+                        ref = {'tokens': [t.i+1 for t in m]}
+                        ref['head'] = find_head(d, ref['tokens'], sent_num+1, 'universal')
+                        r['referents'].append(ref)
+                    d['coreferences'].append(r)
 
         d['meta']['DC.language'] = max(lang)
 
