@@ -225,7 +225,7 @@ class SpacyPipeline(Pipeline):
             # noinspection PyProtectedMember
             for cluster in doc._.coref_clusters:
                 r = build_coreference(cluster.i)
-                r['representative']['tokens'] = [t.i+1 for t in cluster.main]
+                r['representative']['tokens'] = [ t.i + 1 for t in cluster.main ]
                 r['representative']['head'] = find_head(d, r['representative']['tokens'], 'universal')
                 for m in cluster.mentions:
                     if m[0].i+1 in r['representative']['tokens']:
