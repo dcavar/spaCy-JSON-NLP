@@ -5,6 +5,11 @@
 Brought to you by the [NLP-Lab.org]!
 
 
+This only works with spaCy 2.1.0!
+
+I had the same issue. I downgraded Spacy from 2.1.4 to 2.1.0 and numpy to 1.14.5 to resolve.
+
+
 ## Introduction
 
 Currently this module requires Python 3.6+.

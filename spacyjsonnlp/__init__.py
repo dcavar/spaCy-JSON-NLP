@@ -20,7 +20,7 @@ from typing import Dict, Tuple
 
 import neuralcoref
 import spacy
-#from benepar.spacy_plugin import BeneparComponent
+from benepar.spacy_plugin import BeneparComponent
 from pyjsonnlp import get_base, get_base_document, remove_empty_fields, build_constituents, find_head, build_coreference
 from pyjsonnlp.pipeline import Pipeline
 from pyjsonnlp.tokenization import segment
@@ -35,7 +35,7 @@ __version__ = '0.1.2'
 # allowed model names
 MODEL_NAMES = ('en_core_web_sm', 'en_core_web_md', 'en_core_web_lg' 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
                'pt_core_news_sm', 'fr_core_news_sm', 'it_core_news_sm', 'nl_core_news_sm')
-#CONSTITUENTS = {'en': 'benepar_en2', 'de': 'benepar_de'}
+CONSTITUENTS = {'en': 'benepar_en2', 'de': 'benepar_de'}
 COREF = {'en_core_web_sm', 'en_core_web_md', 'en_core_web_lg', 'xx_ent_wiki_sm'}
 WORD_REGEX = re.compile(r'^[A-Za-z]+$')
 
@@ -66,10 +66,10 @@ def get_model(spacy_model: str, coref: bool, constituents: bool) -> Language:
     nlp = spacy.load(spacy_model)
     if coref and spacy_model in COREF:
         neuralcoref.add_to_pipe(nlp)
-    #if constituents:
-    #    model = CONSTITUENTS.get(spacy_model[:2], "")
-    #    if model:
-    #        nlp.add_pipe(BeneparComponent(model))
+    if constituents:
+        model = CONSTITUENTS.get(spacy_model[:2], "")
+        if model:
+            nlp.add_pipe(BeneparComponent(model))
     return nlp
 
 
@@ -116,11 +116,11 @@ class SpacyPipeline(Pipeline):
                 'tokenTo': token_id + len(sent),  # begin inclusive, end exclusive
                 'tokens': []
             }
-            #if constituents:
-            #    try:
-            #        d['constituents'].append(build_constituents(sent_num, sent._.parse_string))
-            #    except Exception:
-            #        pass
+            if constituents:
+                try:
+                    d['constituents'].append(build_constituents(sent_num, sent._.parse_string))
+                except Exception:
+                    pass
 
             sent_lookup[sent.end_char] = sent_num
             d['sentences'][current_sent['id']] =  current_sent
@@ -249,4 +249,4 @@ class SpacyPipeline(Pipeline):
 
 if __name__ == "__main__":
     test_text = "The Mueller Report is a very long report. We spent a long time analyzing it. Trump wishes we didn't, but that didn't stop the intrepid NlpLab."
-    print(SpacyPipeline.process(test_text, spacy_model='en_core_web_md', coreferences=True, constituents=False))
+    print(SpacyPipeline.process(test_text, spacy_model='en_core_web_md', coreferences=True, constituents=True))
