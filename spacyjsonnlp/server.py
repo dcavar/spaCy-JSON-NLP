@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
 from spacyjsonnlp import SpacyPipeline
 from pyjsonnlp.microservices.flask_server import FlaskMicroservice
 
 app = FlaskMicroservice(__name__, SpacyPipeline(), base_route='/')
-app.with_constituents = True
+app.with_constituents = False
 app.with_coreferences = True
 app.with_dependencies = True
 app.with_expressions = True
