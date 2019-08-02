@@ -12,6 +12,7 @@ Brought to you by the NLP-Lab.org (https://nlp-lab.org/)!
 """
 
 
+
 import functools
 import re
 from collections import OrderedDict, defaultdict, Counter
@@ -19,13 +20,6 @@ from typing import Dict, Tuple
 
 import neuralcoref
 import spacy
-
-# -------------------------------
-# prevent issues with benepar and tensorflow
-import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
-# -------------------------------
-
 from benepar.spacy_plugin import BeneparComponent
 from pyjsonnlp import get_base, get_base_document, remove_empty_fields, build_constituents, find_head, build_coreference
 from pyjsonnlp.pipeline import Pipeline
@@ -36,7 +30,7 @@ from spacy.tokens import Doc
 #from dependencies import DependencyAnnotator
 
 name = "spacypyjsonnlp"
-__version__ = '0.0.20'
+__version__ = '0.1.2'
 
 # allowed model names
 MODEL_NAMES = ('en_core_web_sm', 'en_core_web_md', 'en_core_web_lg' 'xx_ent_wiki_sm', 'de_core_news_sm', 'es_core_news_sm',
