@@ -19,6 +19,13 @@ from typing import Dict, Tuple
 
 import neuralcoref
 import spacy
+
+# -------------------------------
+# prevent issues with benepar and tensorflow
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+# -------------------------------
+
 from benepar.spacy_plugin import BeneparComponent
 from pyjsonnlp import get_base, get_base_document, remove_empty_fields, build_constituents, find_head, build_coreference
 from pyjsonnlp.pipeline import Pipeline
